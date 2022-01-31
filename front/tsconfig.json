@@ -16,8 +16,7 @@
       "@layouts/*": ["layouts/*"],
       "@pages/*": ["pages/*"],
       "@utils/*": ["utils/*"],
-      "@typings/*": ["typings/*"],
-      "@apis": ["apis"]
+      "@typings/*": ["typings/*"]
     }
   }
 }
