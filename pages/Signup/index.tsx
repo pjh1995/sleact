@@ -1,19 +1,40 @@
 import React, { useCallback, useState } from 'react';
 import { Button, Error, Form, Header, Input, Label, LinkContainer, Success } from './styles';
-
+import useInput from '@hooks/useInput';
+import { signUp } from '@apis';
+const ERROR_MSG = {
+  MISMATCH: '비밀번호가 일치하지 않습니다.',
+  SIGNUP_SUCCESS: '회원가입되었습니다! 로그인해주세요.',
+  SIGNUP_ERROR: '이미 가입된 이메일입니다.',
+  EMPTY: '모든 값을 입력해주세요.',
+};
 const SignUp = () => {
-  let signUpSuccess = false;
-  let signUpError = true;
-  let mismatchError = false;
-  let password = '';
-  let email = '';
-  let passwordCheck = '';
-  let nickname = '';
-  const onChangePasswordCheck = () => {};
-  const onChangePassword = () => {};
-  const onChangeNickname = () => {};
-  const onChangeEmail = () => {};
-  const onSubmit = () => {};
+  const [email, onChangeEmail] = useInput('');
+  const [password, onChangePassword] = useInput('');
+  const [nickname, onChangeNickname] = useInput('');
+  const [passwordCheck, setPasswordCheck] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const onChangePasswordCheck = useCallback(
+    (e) => {
+      setPasswordCheck(e.target.value);
+      setErrorMsg(e.target.value === password ? '' : ERROR_MSG.MISMATCH);
+    },
+    [password],
+  );
+  const onSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      const checkList = [nickname, email, password, passwordCheck];
+      const isEmpty = checkList.some((v) => v == '');
+      if (isEmpty) return setErrorMsg(ERROR_MSG.EMPTY);
+      if (!Boolean(errorMsg)) {
+        const a = signUp({ email, password, nickname });
+        console.log('submit', a);
+      }
+      console.log({ nickname, email, password, passwordCheck, errorMsg });
+    },
+    [nickname, email, password, passwordCheck],
+  );
   return (
     <div id="container">
       <Header>Sleact</Header>
@@ -47,10 +68,7 @@ const SignUp = () => {
               onChange={onChangePasswordCheck}
             />
           </div>
-          {mismatchError && <Error>비밀번호가 일치하지 않습니다.</Error>}
-          {!nickname && <Error>닉네임을 입력해주세요.</Error>}
-          {signUpError && <Error>이미 가입된 이메일입니다.</Error>}
-          {signUpSuccess && <Success>회원가입되었습니다! 로그인해주세요.</Success>}
+          {Boolean(errorMsg) && <Error>{errorMsg}</Error>}
         </Label>
         <Button type="submit">회원가입</Button>
       </Form>
